@@ -48,10 +48,6 @@ function findVerticalSlides (verticalPhotos) {
             if (common.length > (best.common ? best.common : 0)) {
                 best.id = photo2.id;
                 best.common = common.length;
-                // var union = best.tags.concat(photo2.tags);
-                // best.tags = union.filter(function(item, pos) {
-                //     return union.indexOf(item) == pos;
-                // })
             }
         });
         if (best.id) possibles.push(best);
@@ -116,6 +112,34 @@ function getCommonTags (s1Tags, s2Tags) {
     return common;
 }
 
+function extractBestSlides (possibilities) {
+    if (possibilities.length > 1 ){
+        var best = {};
+        possibilities.forEach(function(slide) {
+            if (slide.factor > (best.factor ? best.factor : 0)) {
+                best = slide;
+            }
+        })
+        return best;
+    } else {
+        return possibilities[0];
+    }
+}
+
+function extractRepeatSlides (possibilities, slides) {
+    if (possibilities.length < 2) {
+        slides.push(possibilities[0]);
+    }
+    else {
+        var best = extractBestSlides(possibilities);
+        slides.push(best);
+        slides = extractRepeatSlides(possibilities.filter(function(slide) {
+            return !(best && (slide.id == best.id || slide.id == best.id2 || slide.id2 == best.id || slide.id2 == best.id2))
+        }), slides);
+    }
+    return slides;
+}
+
 function buildSlideshow (photos, vSlides) {
     hSlides = photos.filter(function(photo) { return photo.h}).map(function(photo){return [photo]});
     var allSlides = hSlides.concat(vSlides);
@@ -136,6 +160,10 @@ function buildSlideshow (photos, vSlides) {
         });
         if (best.id2) possibles.push(best);
     });
+
+
+
+    createSlideshowFile(slides);
 }   
 
 readDir();
