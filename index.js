@@ -3,8 +3,9 @@ const fs = require('fs');
 function readDir() {
     const content = fs.readdirSync('./assets');
     content.forEach(function(f) {
-        const fileContent = fs.readFileSync('./assets/' + f).toString();
-        console.log(fileContent);
+        var dataSet = getDataSet('./assets/' + f);
+        var vSlides = findVerticalSlides(dataSet);
+        buildSlideshow(dataSet, vSlides);
     })
     // console.log(content);
 }
@@ -35,47 +36,31 @@ function createSlideshowFile (slides) {
     })
     const content = `${slides.length}\n${slides.join('\n')}`;
     fs.writeFileSync('./output.txt', content);
-    console.log(content);
-}
-
-function countSlides(photos) {
-    var count = 0;
-    const dataset = [];
-    for (photo in photos) {
-        var vertical = 0;
-        if (photo.h) {
-            count++;
-            dataset.push({
-                id: photo.id
-            });
-        } else {
-            vertical++;
-            if (vertical % 2 === 0 ){
-                count++;
-            }
-            dataset.push({
-                id: photo.id
-            });
-        }
-    }
 }
 
 function findVerticalSlides (verticalPhotos) {
     const possibles = [];
     verticalPhotos.forEach(function(photo, index) {
-        var best = {id2: photo.id};
+        var best = {id2: photo.id, tags: photo.tags};
         const rest = verticalPhotos.slice(index+1);
         rest.forEach(function(photo2) {
             var common = getCommonTags(photo.tags, photo2.tags);
             if (common.length > (best.common ? best.common : 0)) {
                 best.id = photo2.id;
                 best.common = common.length;
+                // var union = best.tags.concat(photo2.tags);
+                // best.tags = union.filter(function(item, pos) {
+                //     return union.indexOf(item) == pos;
+                // })
             }
         });
         if (best.id) possibles.push(best);
     });
 
-    return extractRepeat(possibles, []);
+    return extractRepeat(possibles, []).map(function(slide) {
+        return [verticalPhotos.find(function(photo) { return photo.id == slide.id}),
+        verticalPhotos.find(function(photo) { return photo.id == slide.id2})]
+    });
 }
 
 function extractBest (possibilities) {
@@ -84,7 +69,6 @@ function extractBest (possibilities) {
         possibilities.forEach(function(slide) {
             if (slide.common > (best.common ? best.common : 0)) {
                 best = slide;
-                console.log(best);
             }
         })
         return best;
@@ -132,27 +116,26 @@ function getCommonTags (s1Tags, s2Tags) {
     return common;
 }
 
-const v = [
-    {
-        id: 0,
-        h: false,
-        tags: ['pepe', 'hola', 'cosa']
-    },
-    {
-        id: 1,
-        h: false,
-        tags: ['pepe', 'hola', 'cosa']
-    },
-    {
-        id: 2,
-        h: false,
-        tags: ['pepe3', 'hola', 'cosa']
-    },
-    {
-        id: 3,
-        h: false,
-        tags: ['pepe3', 'hola2', 'cosa']
-    },
-];
+function buildSlideshow (photos, vSlides) {
+    hSlides = photos.filter(function(photo) { return photo.h}).map(function(photo){return [photo]});
+    var allSlides = hSlides.concat(vSlides);
+    var possibles = [];
+    allSlides.forEach(function(slide, index) {
+        var best = {id: index, tags: slide.tags};
+        const rest = allSlides.slice(index+1);
+        rest.forEach(function(slide2, index2) {
+            var factor2 = interestFactor(slide, slide2);
+            if ( factor2> (best.factor ? best.factor : 0)) {
+                best.id2 = index2;
+                best.factor = factor2;
+                // var union = best.tags.concat(photo2.tags);
+                // best.tags = union.filter(function(item, pos) {
+                //     return union.indexOf(item) == pos;
+                // })
+            }
+        });
+        if (best.id2) possibles.push(best);
+    });
+}   
 
-console.log(findVerticalSlides(v));
+readDir();
