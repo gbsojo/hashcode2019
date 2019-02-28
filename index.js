@@ -42,3 +42,26 @@ function createSlideshowFile (slides) {
 // getDataSet('./assets/a_example.txt');
 const slides = [[0], [1, 2], [3], [4,5]];
 createSlideshowFile(slides);
+getDataSet('./assets/a_example.txt');
+
+function countSlides(photos) {
+    var count = 0;
+    const dataset = [];
+    for (photo in photos) {
+        var vertical = 0;
+        if (photo.h) {
+            count++;
+            dataset.push({
+                id: photo.id
+            });
+        } else {
+            vertical++;
+            if (vertical % 2 === 0 ){
+                count++;
+            }
+            dataset.push({
+                id: photo.id
+            });
+        }
+    }
+}
