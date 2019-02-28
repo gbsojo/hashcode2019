@@ -29,5 +29,16 @@ function getDataSet (path) {
     console.log(dataSet);
 }
 
+function createSlideshowFile (slides) {
+    slides.map(function(photo) {
+        return `${slides.join(' ')}`;
+    })
+    const content = `${slides.length}\n${slides.join('\n')}`;
+    fs.writeFileSync('./output.txt', content);
+    // console.log(content);
+}
+
 // readDir();
-getDataSet('./assets/a_example.txt');
+// getDataSet('./assets/a_example.txt');
+const slides = [[0], [1, 2], [3], [4,5]];
+createSlideshowFile(slides);
