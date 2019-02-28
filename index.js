@@ -26,7 +26,7 @@ function getDataSet (path) {
             tags: tags
         })
     });
-    console.log(dataSet);
+    return dataSet;
 }
 
 function createSlideshowFile (slides) {
