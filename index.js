@@ -38,6 +38,28 @@ function createSlideshowFile (slides) {
     console.log(content);
 }
 
+function countSlides(photos) {
+    var count = 0;
+    const dataset = [];
+    for (photo in photos) {
+        var vertical = 0;
+        if (photo.h) {
+            count++;
+            dataset.push({
+                id: photo.id
+            });
+        } else {
+            vertical++;
+            if (vertical % 2 === 0 ){
+                count++;
+            }
+            dataset.push({
+                id: photo.id
+            });
+        }
+    }
+}
+
 function interestFactor (s1, s2) {
     s1Tags = getSlideTags(s1);
     s2Tags = getSlideTags(s2);
