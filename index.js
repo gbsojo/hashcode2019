@@ -9,8 +9,24 @@ function readDir() {
     // console.log(content);
 }
 
-function getDataSet () {
-    
+function getDataSet (path) {
+    const fileContent = fs.readFileSync(path).toString();
+    var splitContent = fileContent.split('\n');
+    const qty = splitContent.shift();
+    const dataSet = []
+    splitContent.forEach(function (p, index) {
+        const line = p.split(' ');
+        const h = line.shift() == 'H';
+        line.shift();
+        const tags = line;
+        dataSet.push({
+            id: index,
+            h: h,
+            tags: tags
+        })
+    });
+    console.log(dataSet);
 }
 
-readDir();
+// readDir();
+getDataSet('./assets/a_example.txt');
