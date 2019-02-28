@@ -15,6 +15,7 @@ function getDataSet (path) {
     const qty = splitContent.shift();
     const dataSet = []
     splitContent.forEach(function (p, index) {
+        if (index >= qty) return;
         const line = p.split(' ');
         const h = line.shift() == 'H';
         line.shift();
