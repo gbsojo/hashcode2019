@@ -35,11 +35,47 @@ function createSlideshowFile (slides) {
     })
     const content = `${slides.length}\n${slides.join('\n')}`;
     fs.writeFileSync('./output.txt', content);
-    // console.log(content);
+    console.log(content);
 }
 
-// readDir();
-// getDataSet('./assets/a_example.txt');
-const slides = [[0], [1, 2], [3], [4,5]];
-createSlideshowFile(slides);
-getDataSet('./assets/a_example.txt');
+function countSlides(photos) {
+    var count = 0;
+    const dataset = [];
+    for (photo in photos) {
+        var vertical = 0;
+        if (photo.h) {
+            count++;
+            dataset.push({
+                id: photo.id
+            });
+        } else {
+            vertical++;
+            if (vertical % 2 === 0 ){
+                count++;
+            }
+            dataset.push({
+                id: photo.id
+            });
+        }
+    }
+}
+
+function interestFactor (s1, s2) {
+    s1Tags = getSlideTags(s1);
+    s2Tags = getSlideTags(s2);
+    const common = [];
+    s1Tags.forEach(function(s1tag) {
+        if (s2Tags.indexOf(s1tag) !== -1) {
+            common.push(s1tag);
+        }
+    })
+    return Math.min(s1Tags.length, s2Tags.length, common.length);
+};
+
+function getSlideTags (s1) {
+    return s1.map(function(photo) {
+        return photo.tags;
+    }).reduce(function(prev, curr) {
+        return prev.concat(curr);
+    });
+}
